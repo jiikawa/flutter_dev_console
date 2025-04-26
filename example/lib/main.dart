@@ -1,6 +1,7 @@
-import 'package:dev_console/dev_console.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_dev_console/dev_console.dart';
 
 void main() {
   // 初始化开发控制台
@@ -220,11 +221,14 @@ class DevConsoleDemoState extends State<DevConsoleDemo> {
       await _dio.get('https://jsonplaceholder.typicode.com/invalid');
     } catch (e) {
       // 错误已被拦截器记录，这里不需要额外处理
-      print('有些请求可能失败，但已被记录');
+      if (kDebugMode) {
+        print('有些请求可能失败，但已被记录');
+      }
     }
 
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('已发起真实API请求')),
+      const SnackBar(content: Text('已发起真实API请求')),
     );
   }
 }

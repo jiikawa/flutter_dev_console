@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^5.8.0+1
-  dev_console:
+  flutter_dev_console:
     path: ../
 
 dev_dependencies:
