@@ -1,7 +1,6 @@
 import 'package:dev_console/dev_console.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
   // 初始化开发控制台
@@ -10,47 +9,43 @@ void main() {
     maxRequestCount: 100,
     theme: DevConsoleTheme(
       primaryColor: Colors.blue,
-      backgroundColor: Color(0xF0121212),
+      backgroundColor: const Color(0xF0121212),
       textColor: Colors.white,
     ),
   );
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(360, 690),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return MaterialApp(
-          title: 'DevConsole Demo',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-            brightness: Brightness.light,
-          ),
-          darkTheme: ThemeData(
-            primarySwatch: Colors.blue,
-            brightness: Brightness.dark,
-          ),
-          themeMode: ThemeMode.system,
-          home: child,
-        );
-      },
-      child: DevConsoleDemo(),
+    return MaterialApp(
+      title: 'DevConsole Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        brightness: Brightness.light,
+      ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
+      ),
+      themeMode: ThemeMode.system,
+      home: const DevConsoleDemo(),
     );
   }
 }
 
 class DevConsoleDemo extends StatefulWidget {
+  const DevConsoleDemo({super.key});
+
   @override
-  _DevConsoleDemoState createState() => _DevConsoleDemoState();
+  DevConsoleDemoState createState() => DevConsoleDemoState();
 }
 
-class _DevConsoleDemoState extends State<DevConsoleDemo> {
+class DevConsoleDemoState extends State<DevConsoleDemo> {
   final Dio _dio = Dio();
 
   late ApiLogger _apiLogger;
@@ -111,7 +106,7 @@ class _DevConsoleDemoState extends State<DevConsoleDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('DevConsole 示例'),
+        title: const Text('DevConsole 示例'),
       ),
       body: Center(
         child: Column(
@@ -122,22 +117,22 @@ class _DevConsoleDemoState extends State<DevConsoleDemo> {
                 // 显示开发控制台
                 DevConsole.instance.show(context);
               },
-              child: Text('显示开发控制台'),
+              child: const Text('显示开发控制台'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _addTestLogs,
-              child: Text('添加测试日志'),
+              child: const Text('添加测试日志'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _addTestApiRequests,
-              child: Text('添加测试API请求'),
+              child: const Text('添加测试API请求'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _makeRealApiRequest,
-              child: Text('发起真实API请求'),
+              child: const Text('发起真实API请求'),
             ),
           ],
         ),
@@ -146,8 +141,8 @@ class _DevConsoleDemoState extends State<DevConsoleDemo> {
         onPressed: () {
           DevConsole.instance.show(context);
         },
-        child: Icon(Icons.developer_mode),
         tooltip: '开发控制台',
+        child: const Icon(Icons.developer_mode),
       ),
     );
   }
@@ -169,7 +164,7 @@ class _DevConsoleDemoState extends State<DevConsoleDemo> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('已添加测试日志')),
+      const SnackBar(content: Text('已添加测试日志')),
     );
   }
 
@@ -201,7 +196,7 @@ class _DevConsoleDemoState extends State<DevConsoleDemo> {
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('已添加测试API请求')),
+      const SnackBar(content: Text('已添加测试API请求')),
     );
   }
 

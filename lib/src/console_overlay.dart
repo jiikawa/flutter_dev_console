@@ -26,27 +26,22 @@ class ConsoleOverlay extends StatefulWidget {
   /// [logManager] 日志管理器
   /// [apiMonitor] API监听器
   const ConsoleOverlay({
-    Key? key,
+    super.key,
     this.theme,
     required this.logManager,
     required this.apiMonitor,
     required this.eventTracker, // Add this line
-  }) : super(key: key);
+  });
 
   @override
-  _ConsoleOverlayState createState() => _ConsoleOverlayState();
+  ConsoleOverlayState createState() => ConsoleOverlayState();
 }
 
-class _ConsoleOverlayState extends State<ConsoleOverlay>
+class ConsoleOverlayState extends State<ConsoleOverlay>
     with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   int _selectedTabIndex = 0;
@@ -115,8 +110,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
             ],
           ),
           IconButton(
-            icon:
-                Icon(Icons.close, color: _textColor.withOpacity(0.7), size: 18),
+            icon: Icon(Icons.close,
+                color: _textColor.withAlpha((0.7 * 255).round()), size: 18),
             padding: EdgeInsets.all(4),
             constraints: BoxConstraints(minWidth: 36, minHeight: 36),
             onPressed: () {
@@ -176,7 +171,7 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
               style: TextStyle(
                 color: isSelected
                     ? _primaryColor
-                    : _textColor.withValues(alpha: 0.7),
+                    : _textColor.withAlpha((0.7 * 255).round()),
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 14,
               ),
@@ -222,7 +217,7 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
             Text(
               '没有日志记录',
               style: TextStyle(
-                color: _textColor.withOpacity(0.7),
+                color: _textColor.withAlpha((0.7 * 255).round()),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -347,7 +342,7 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                             children: [
                               Text(
                                 message.length > 50
-                                    ? message.substring(0, 50) + '...'
+                                    ? '${message.substring(0, 50)}...'
                                     : message,
                                 style: TextStyle(
                                   color: _textColor,
@@ -359,7 +354,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                               Text(
                                 '[$timeStr] $tag',
                                 style: TextStyle(
-                                  color: _textColor.withOpacity(0.7),
+                                  color:
+                                      _textColor.withAlpha((0.7 * 255).round()),
                                   fontSize: 12,
                                 ),
                               ),
@@ -368,7 +364,7 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                         ),
                         Icon(
                           Icons.arrow_forward_ios,
-                          color: _textColor.withOpacity(0.54),
+                          color: _textColor.withAlpha((0.54 * 255).round()),
                           size: 14,
                         ),
                       ],
@@ -395,7 +391,7 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
             Text(
               '没有API请求记录',
               style: TextStyle(
-                color: _textColor.withValues(alpha: 0.7),
+                color: _textColor.withAlpha((0.7 * 255).round()),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -545,7 +541,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                                     Text(
                                       ' (${duration}ms)',
                                       style: TextStyle(
-                                        color: _textColor.withOpacity(0.7),
+                                        color: _textColor
+                                            .withAlpha((0.7 * 255).round()),
                                         fontSize: 12,
                                       ),
                                     ),
@@ -554,7 +551,7 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                               SizedBox(height: 4),
                               Text(
                                 url.length > 50
-                                    ? url.substring(0, 50) + '...'
+                                    ? '${url.substring(0, 50)}...'
                                     : url,
                                 style: TextStyle(
                                   color: _textColor,
@@ -566,7 +563,7 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                         ),
                         Icon(
                           Icons.arrow_forward_ios,
-                          color: _textColor.withOpacity(0.54),
+                          color: _textColor.withAlpha((0.54 * 255).round()),
                           size: 14,
                         ),
                       ],
@@ -583,14 +580,86 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
 
   // 构建埋点事件标签页（简化版）
   Widget _buildEventsTab() {
-    return Center(
-      child: Text(
-        '埋点事件功能待实现',
-        style: TextStyle(
-          color: _textColor.withValues(alpha: 0.7),
-          fontSize: 14,
+    final events = widget.eventTracker.getEvents();
+
+    if (events.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              '没有埋点事件记录',
+              style: TextStyle(
+                color: _textColor.withAlpha((0.7 * 255).round()),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                // 生成测试事件
+                widget.eventTracker.generateTestEvents();
+                setState(() {});
+              },
+              child: Text('添加测试事件'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _primaryColor,
+                foregroundColor: Colors.black,
+              ),
+            ),
+          ],
         ),
-      ),
+      );
+    }
+
+    return Column(
+      children: [
+        // 标题和操作按钮
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '事件数量: ${events.length}',
+                style: TextStyle(
+                  color: _textColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  widget.eventTracker.clearEvents();
+                  setState(() {});
+                },
+                child: Text(
+                  '清除所有',
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // 事件列表
+        Expanded(
+          child: ListView.builder(
+            itemCount: events.length,
+            physics: BouncingScrollPhysics(),
+            padding: EdgeInsets.symmetric(vertical: 4),
+            itemBuilder: (context, index) {
+              final event = events[index];
+              return _buildEventItem(event);
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -701,7 +770,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: levelColor.withOpacity(0.2),
+                                  color:
+                                      levelColor.withAlpha((0.2 * 255).round()),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -717,7 +787,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                               Text(
                                 timeStr,
                                 style: TextStyle(
-                                  color: _textColor.withOpacity(0.7),
+                                  color:
+                                      _textColor.withAlpha((0.7 * 255).round()),
                                   fontSize: 12,
                                 ),
                               ),
@@ -729,7 +800,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                               Text(
                                 '标签: ',
                                 style: TextStyle(
-                                  color: _textColor.withOpacity(0.7),
+                                  color:
+                                      _textColor.withAlpha((0.7 * 255).round()),
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -738,7 +810,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: _primaryColor.withOpacity(0.2),
+                                  color: _primaryColor
+                                      .withAlpha((0.2 * 255).round()),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -755,7 +828,7 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                           Text(
                             '消息:',
                             style: TextStyle(
-                              color: _textColor.withOpacity(0.7),
+                              color: _textColor.withAlpha((0.7 * 255).round()),
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
@@ -876,7 +949,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                               child: Text(
                                 stackTrace,
                                 style: TextStyle(
-                                  color: _textColor.withOpacity(0.8),
+                                  color:
+                                      _textColor.withAlpha((0.8 * 255).round()),
                                   fontSize: 12,
                                   fontFamily: 'monospace',
                                 ),
@@ -907,8 +981,6 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
     final response = request['response'];
     final error = request['error'] as String?;
     final status = request['status'] as RequestStatus;
-    final startTime = request['startTime'] as DateTime;
-    final endTime = request['endTime'] as DateTime;
     final duration = request['duration'] as int;
 
     // 获取请求状态的颜色和图标
@@ -1007,7 +1079,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: statusColor.withOpacity(0.2),
+                                  color: statusColor
+                                      .withAlpha((0.2 * 255).round()),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -1042,7 +1115,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: statusCodeColor.withOpacity(0.2),
+                                    color: statusCodeColor
+                                        .withAlpha((0.2 * 255).round()),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
@@ -1059,7 +1133,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                               Text(
                                 '${duration}ms',
                                 style: TextStyle(
-                                  color: _textColor.withOpacity(0.7),
+                                  color:
+                                      _textColor.withAlpha((0.7 * 255).round()),
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -1072,7 +1147,7 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                           Text(
                             'URL:',
                             style: TextStyle(
-                              color: _textColor.withOpacity(0.7),
+                              color: _textColor.withAlpha((0.7 * 255).round()),
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
@@ -1128,7 +1203,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                             Text(
                               '请求头:',
                               style: TextStyle(
-                                color: _textColor.withOpacity(0.7),
+                                color:
+                                    _textColor.withAlpha((0.7 * 255).round()),
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -1159,7 +1235,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                             Text(
                               '查询参数:',
                               style: TextStyle(
-                                color: _textColor.withOpacity(0.7),
+                                color:
+                                    _textColor.withAlpha((0.7 * 255).round()),
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -1189,7 +1266,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                             Text(
                               '请求数据:',
                               style: TextStyle(
-                                color: _textColor.withOpacity(0.7),
+                                color:
+                                    _textColor.withAlpha((0.7 * 255).round()),
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -1290,7 +1368,8 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
                             Text(
                               '响应数据:',
                               style: TextStyle(
-                                color: _textColor.withOpacity(0.7),
+                                color:
+                                    _textColor.withAlpha((0.7 * 255).round()),
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -1326,6 +1405,328 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
     );
   }
 
+  // 构建埋点事件详情视图
+  Widget _buildEventDetailsView(Map<String, dynamic> event) {
+    final name = event['name'] as String;
+    final category = event['category'] as String;
+    final time = event['time'] as DateTime;
+    final parameters = event['parameters'] as Map<String, dynamic>?;
+    final status = event['status'] as EventStatus;
+    final errorMessage = event['errorMessage'] as String?;
+    final id = event['id'] as String;
+
+    // 格式化时间
+    final timeStr =
+        "${time.year}-${time.month.toString().padLeft(2, '0')}-${time.day.toString().padLeft(2, '0')} "
+        "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}:${time.second.toString().padLeft(2, '0')}";
+
+    // 获取状态的颜色和图标
+    Color statusColor;
+    IconData statusIcon;
+    String statusName;
+
+    switch (status) {
+      case EventStatus.pending:
+        statusColor = Colors.orange;
+        statusIcon = Icons.hourglass_empty;
+        statusName = "待上传";
+        break;
+      case EventStatus.success:
+        statusColor = Colors.green;
+        statusIcon = Icons.check_circle;
+        statusName = "成功";
+        break;
+      case EventStatus.failed:
+        statusColor = Colors.red;
+        statusIcon = Icons.error;
+        statusName = "失败";
+        break;
+    }
+
+    return Container(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 顶部操作栏
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.analytics, color: _textColor, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    '埋点事件详情',
+                    style: TextStyle(
+                      color: _textColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              IconButton(
+                icon: Icon(Icons.close, color: _textColor, size: 20),
+                onPressed: () {
+                  setState(() {
+                    _showingDetails = false;
+                    _currentDetailEvent = null;
+                  });
+                },
+              ),
+            ],
+          ),
+
+          SizedBox(height: 16),
+
+          // 详情内容
+          Expanded(
+            child: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 基本信息卡片
+                  Card(
+                    color: Color(0xFF1F1F1F),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide(color: Colors.grey.shade800, width: 0.5),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(statusIcon, color: statusColor, size: 24),
+                              SizedBox(width: 8),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: statusColor
+                                      .withAlpha((0.2 * 255).round()),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  statusName,
+                                  style: TextStyle(
+                                    color: statusColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                              Spacer(),
+                              Text(
+                                timeStr,
+                                style: TextStyle(
+                                  color:
+                                      _textColor.withAlpha((0.7 * 255).round()),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Text(
+                                '事件ID: ',
+                                style: TextStyle(
+                                  color:
+                                      _textColor.withAlpha((0.7 * 255).round()),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  id,
+                                  style: TextStyle(
+                                    color: _textColor,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Text(
+                                '事件名称: ',
+                                style: TextStyle(
+                                  color:
+                                      _textColor.withAlpha((0.7 * 255).round()),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                name,
+                                style: TextStyle(
+                                  color: _textColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Text(
+                                '分类: ',
+                                style: TextStyle(
+                                  color:
+                                      _textColor.withAlpha((0.7 * 255).round()),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: _primaryColor
+                                      .withAlpha((0.2 * 255).round()),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  category,
+                                  style: TextStyle(
+                                    color: _primaryColor,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // 参数信息（如果有）
+                  if (parameters != null && parameters.isNotEmpty) ...[
+                    SizedBox(height: 16),
+                    Card(
+                      color: Color(0xFF1F1F1F),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side:
+                            BorderSide(color: Colors.grey.shade800, width: 0.5),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.data_object,
+                                    color: Colors.blue, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  '事件参数',
+                                  style: TextStyle(
+                                    color: _textColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 12),
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Color(0xFF2A2A2A),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                _formatJson(parameters),
+                                style: TextStyle(
+                                  color: _textColor,
+                                  fontSize: 12,
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+
+                  // 错误信息（如果有）
+                  if (errorMessage != null) ...[
+                    SizedBox(height: 16),
+                    Card(
+                      color: Color(0xFF1F1F1F),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side:
+                            BorderSide(color: Colors.grey.shade800, width: 0.5),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.error_outline,
+                                    color: Colors.red, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  '错误信息',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 12),
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Color(0xFF2A2A2A),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                errorMessage,
+                                style: TextStyle(
+                                  color: Colors.red.shade300,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   // 格式化JSON对象
   String _formatJson(Map<String, dynamic> json) {
     try {
@@ -1345,7 +1746,7 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
     if (value is Map) {
       final buffer = StringBuffer();
       buffer.writeln('{');
-      (value as Map).forEach((k, v) {
+      value.forEach((k, v) {
         buffer.writeln('  $k: ${_formatValue(v)}');
       });
       buffer.writeln('}');
@@ -1361,39 +1762,6 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
     } else {
       return value?.toString() ?? 'null';
     }
-  }
-
-  // 构建埋点事件详情视图（简化版）
-  Widget _buildEventDetailsView(Map<String, dynamic> event) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '埋点事件详情',
-            style: TextStyle(
-              color: _textColor,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _showingDetails = false;
-                _currentDetailEvent = null;
-              });
-            },
-            child: Text('返回'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _primaryColor,
-              foregroundColor: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   // 获取HTTP方法的颜色
@@ -1429,23 +1797,111 @@ class _ConsoleOverlayState extends State<ConsoleOverlay>
     }
   }
 
-  // 事件状态对应的颜色和图标
-  Widget _getEventStatusWidget(dynamic status) {
-    if (status == EventStatus.success) {
-      return Icon(Icons.check_circle, color: Colors.green, size: 16);
-    } else if (status == EventStatus.failed) {
-      return Icon(Icons.error, color: Colors.red, size: 16);
-    } else {
-      return Icon(Icons.hourglass_empty, color: Colors.orange, size: 16);
-    }
-  }
-
   // 在事件列表项中添加状态显示
   Widget _buildEventItem(Map<String, dynamic> event) {
-    return ListTile(
-      // ... existing code ...
-      trailing: _getEventStatusWidget(event['status']),
-      // ... existing code ...
+    final name = event['name'] as String;
+    final category = event['category'] as String;
+    final time = event['time'] as DateTime;
+    final status = event['status'] as EventStatus;
+    final timeStr =
+        "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}:${time.second.toString().padLeft(2, '0')}";
+
+    Color statusColor;
+    IconData statusIcon;
+
+    switch (status) {
+      case EventStatus.pending:
+        statusColor = Colors.orange;
+        statusIcon = Icons.hourglass_empty;
+        break;
+      case EventStatus.success:
+        statusColor = Colors.green;
+        statusIcon = Icons.check_circle;
+        break;
+      case EventStatus.failed:
+        statusColor = Colors.red;
+        statusIcon = Icons.error;
+        break;
+    }
+
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      color: Color(0xFF1F1F1F),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: Colors.grey.shade800, width: 0.5),
+      ),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _currentDetailEvent = event;
+            _showingDetails = true;
+          });
+        },
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Icon(
+                statusIcon,
+                color: statusColor,
+                size: 20,
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        color: _textColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: _primaryColor.withAlpha((0.2 * 255).round()),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            category,
+                            style: TextStyle(
+                              color: _primaryColor,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          timeStr,
+                          style: TextStyle(
+                            color: _textColor.withAlpha((0.7 * 255).round()),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: _textColor.withAlpha((0.54 * 255).round()),
+                size: 14,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:async';
 
 /// 日志级别
 enum LogLevel {
@@ -24,9 +23,6 @@ class LogManager {
   ///
   /// [maxLogCount] 最大日志数量
   LogManager({int maxLogCount = 1000}) : _maxLogCount = maxLogCount;
-
-  /// 刷新定时器
-  Timer? _refreshTimer;
 
   /// 最大日志数量
   final int _maxLogCount;
@@ -64,8 +60,8 @@ class LogManager {
       'level': level,
       'tag': tag ?? 'App',
       'time': DateTime.now(),
-      'stackTrace': stackTrace != null ? stackTrace.toString() : null,
-      'error': error != null ? error.toString() : null,
+      'stackTrace': stackTrace?.toString(),
+      'error': error?.toString(),
     });
   }
 

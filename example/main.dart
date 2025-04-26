@@ -102,7 +102,7 @@ class _DevConsoleDemoState extends State<DevConsoleDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('DevConsole 示例'),
+        title: const Text('DevConsole 示例'),
       ),
       body: Center(
         child: Column(
@@ -113,12 +113,12 @@ class _DevConsoleDemoState extends State<DevConsoleDemo> {
                 // 显示开发控制台
                 DevConsole.instance.show(context);
               },
-              child: Text('显示开发控制台'),
+              child: const Text('显示开发控制台'),
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _addTestLogs,
-              child: Text('添加测试日志'),
+              child: const Text('添加测试日志'),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -137,8 +137,8 @@ class _DevConsoleDemoState extends State<DevConsoleDemo> {
         onPressed: () {
           DevConsole.instance.show(context);
         },
-        child: Icon(Icons.developer_mode),
         tooltip: '开发控制台',
+        child: const Icon(Icons.developer_mode),
       ),
     );
   }
@@ -160,7 +160,7 @@ class _DevConsoleDemoState extends State<DevConsoleDemo> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('已添加测试日志')),
+      const SnackBar(content: Text('已添加测试日志')),
     );
   }
 
@@ -208,11 +208,10 @@ class _DevConsoleDemoState extends State<DevConsoleDemo> {
       await _dio.get('https://jsonplaceholder.typicode.com/invalid');
     } catch (e) {
       // 错误已被拦截器记录，这里不需要额外处理
-      print('有些请求可能失败，但已被记录');
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('已发起真实API请求')),
+      const SnackBar(content: Text('已发起真实API请求')),
     );
   }
 }

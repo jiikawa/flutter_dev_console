@@ -204,7 +204,9 @@ class DevConsole {
           eventTracker: eventTracker,
         ),
       );
-    } catch (e) {}
+    } catch (e) {
+      log('显示开发控制台失败: $e', level: LogLevel.error, tag: 'DevConsole');
+    }
   }
 
   /// 关闭开发控制台
