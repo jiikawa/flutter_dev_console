@@ -60,21 +60,22 @@ class ConsoleOverlayState extends State<ConsoleOverlay>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: _backgroundColor,
-      child: SafeArea(
-        bottom: true,
-        child: Column(
-          children: [
-            _buildHeader(), // 标题
-            _buildTabBar(), // 标签栏
-            Expanded(
-              child: _buildTabContent(), // 内容区域
-            ),
-          ],
-        ),
-      ),
-    );
+    return DefaultTextStyle.merge(
+        style: TextStyle(decoration: TextDecoration.none), // 移除默认下划线
+        child: Container(
+            color: _backgroundColor,
+            child: SafeArea(
+              bottom: true,
+              child: Column(
+                children: [
+                  _buildHeader(), // 标题
+                  _buildTabBar(), // 标签栏
+                  Expanded(
+                    child: _buildTabContent(), // 内容区域
+                  ),
+                ],
+              ),
+            )));
   }
 
   Widget _buildHeader() {
@@ -103,8 +104,6 @@ class ConsoleOverlayState extends State<ConsoleOverlay>
                   color: _textColor,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  fontStyle: FontStyle.normal,
-                  decoration: TextDecoration.none,
                 ),
               ),
             ],
@@ -174,6 +173,7 @@ class ConsoleOverlayState extends State<ConsoleOverlay>
                     : _textColor.withAlpha((0.7 * 255).round()),
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 14,
+                decoration: TextDecoration.none, // 移除下划线
               ),
             ),
           ),

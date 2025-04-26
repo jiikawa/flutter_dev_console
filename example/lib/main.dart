@@ -27,10 +27,18 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.light,
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(decoration: TextDecoration.none),
+          bodyMedium: TextStyle(decoration: TextDecoration.none),
+          bodySmall: TextStyle(decoration: TextDecoration.none),
+        ),
       ),
       darkTheme: ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.dark,
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(color: Colors.white),
+        ),
       ),
       themeMode: ThemeMode.system,
       home: const DevConsoleDemo(),
