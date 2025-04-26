@@ -1,7 +1,7 @@
 name: dev_console
-description: A starting point for Dart libraries or applications.
+description: A lightweight Flutter dev console for viewing API requests, logs, and analytics events in real time.
 version: 1.0.0
-repository: https://github.com/jiang1654/startup_time_plugin.git
+repository: https://github.com/jiikawa/flutter_dev_console.git
 
 environment:
   sdk: ^3.6.0
