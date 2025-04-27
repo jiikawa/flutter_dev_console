@@ -14,7 +14,7 @@ DevConsole 是一个用于 Flutter 应用的开发调试工具，提供日志管
 
 ```yaml
 dependencies:
-  dev_console: ^0.1.0
+  dev_console: ^1.0.2
 ```
 
 或者，如果你想使用本地路径：
@@ -191,7 +191,87 @@ Future<void> setupDio() async {
 }
 ```
 
-### 3. 显示控制台
+### 3. 使用网络拦截器自动抓包API请求
+
+除了手动记录API请求外，DevConsole还提供了网络拦截器接口，可以自动抓包和记录API请求，不需要在每个请求中手动添加日志记录代码。
+
+```dart
+import 'package:dev_console/dev_console.dart';
+import 'package:dio/dio.dart';
+
+// 创建一个实现NetworkInterceptor接口的Dio拦截器
+class DioNetworkInterceptor extends Interceptor implements NetworkInterceptor {
+  @override
+  final ApiMonitor apiMonitor;
+  
+  DioNetworkInterceptor({required this.apiMonitor});
+  
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    // 记录请求开始
+    final requestId = logRequestStart(
+      options.uri.toString(),
+      options.method,
+      headers: options.headers,
+      data: options.data,
+      queryParameters: options.queryParameters,
+    );
+    
+    // 在options中存储requestId，用于后续更新
+    options.extra['requestId'] = requestId;
+    
+    super.onRequest(options, handler);
+  }
+  
+  @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    // 从options中获取requestId
+    final requestId = response.requestOptions.extra['requestId'] as String?;
+    
+    if (requestId != null) {
+      // 记录请求成功
+      logRequestSuccess(
+        requestId,
+        response.statusCode,
+        response.data,
+      );
+    }
+    
+    super.onResponse(response, handler);
+  }
+  
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    // 从options中获取requestId
+    final requestId = err.requestOptions.extra['requestId'] as String?;
+    
+    if (requestId != null) {
+      // 记录请求失败
+      logRequestError(
+        requestId,
+        err.toString(),
+        statusCode: err.response?.statusCode,
+      );
+    }
+    
+    super.onError(err, handler);
+  }
+}
+
+// 使用方式
+void setupDioWithInterceptor() {
+  final dio = Dio();
+  final apiMonitor = DevConsole.instance.getApiMonitor();
+  dio.interceptors.add(DioNetworkInterceptor(apiMonitor: apiMonitor));
+  
+  // 现在所有通过这个dio实例发出的请求都会被自动记录到DevConsole中
+  // 不需要再手动调用apiLogger.logRequest/logResponse/logError方法
+}
+```
+
+对于其他HTTP客户端，您可以参考NetworkInterceptor接口的实现指南，创建适合您使用的HTTP客户端的拦截器。
+
+### 4. 显示控制台
 
 在需要时显示开发控制台：
 
@@ -216,7 +296,7 @@ FloatingActionButton(
 )
 ```
 
-### 4. 记录日志
+### 5. 记录日志
 
 使用 DevConsole 记录日志：
 
@@ -245,7 +325,7 @@ try {
 }
 ```
 
-### 5. 快捷 API 记录方法
+### 6. 快捷 API 记录方法
 
 你可以使用 DevConsole 的简便方法快速记录 API 请求：
 
@@ -269,7 +349,7 @@ DevConsole.instance.logApiRequest(
 );
 ```
 
-### 6. 记录埋点事件
+### 7. 记录埋点事件
 
 使用DevConsole记录和跟踪埋点事件：
 

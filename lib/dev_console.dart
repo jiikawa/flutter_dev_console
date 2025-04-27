@@ -3,8 +3,10 @@ import 'package:flutter/foundation.dart';
 
 // 导出所有公开的类和枚举
 export 'src/log_manager.dart' show LogLevel;
-export 'src/api_monitor.dart' show RequestStatus;
+export 'src/api_monitor.dart' show RequestStatus, ApiMonitor;
 export 'src/api_logging/api_logger.dart' show ApiLogger, ApiLoggerFactory;
+export 'src/api_logging/network_interceptor.dart'
+    show NetworkInterceptor, NetworkInterceptorFactory;
 export 'src/event_tracker.dart' show EventStatus;
 
 // 导入内部实现
@@ -305,6 +307,19 @@ class DevConsole {
     }
 
     return ApiLoggerFactory.create(apiMonitor: apiMonitor);
+  }
+
+  /// 获取API监视器
+  ///
+  /// 返回一个可以用于监听API请求的ApiMonitor实例
+  /// 可以与NetworkInterceptor配合使用，实现API请求的自动抓包监听
+  ApiMonitor getApiMonitor() {
+    // 如果未初始化，则先初始化
+    if (!_isInitialized) {
+      initialize();
+    }
+
+    return apiMonitor;
   }
 
   /// 清除所有日志

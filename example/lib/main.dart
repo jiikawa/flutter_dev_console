@@ -86,9 +86,6 @@ class DevConsoleDemoState extends State<DevConsoleDemo> {
           response.requestOptions.method,
           response.statusCode,
           response.data,
-          headers: response.requestOptions.headers,
-          data: response.requestOptions.data,
-          queryParameters: response.requestOptions.queryParameters,
         );
         return handler.next(response);
       },
@@ -98,10 +95,6 @@ class DevConsoleDemoState extends State<DevConsoleDemo> {
           error.requestOptions.uri.toString(),
           error.requestOptions.method,
           error.toString(),
-          statusCode: error.response?.statusCode,
-          headers: error.requestOptions.headers,
-          data: error.requestOptions.data,
-          queryParameters: error.requestOptions.queryParameters,
         );
         return handler.next(error);
       },

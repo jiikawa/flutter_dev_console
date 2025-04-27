@@ -15,6 +15,9 @@ enum RequestStatus {
 /// API请求监听器
 ///
 /// 负责监听和记录应用中的API请求
+///
+/// 支持添加新请求和更新现有请求的状态，使得一个API请求的完整生命周期
+/// 可以在单个记录中跟踪，而不是创建多个记录。
 class ApiMonitor {
   /// 创建一个API监听器实例
   ///
@@ -37,7 +40,13 @@ class ApiMonitor {
   }
 
   /// 添加请求记录
-  void addRequest(
+  ///
+  /// 创建一个新的API请求记录，并返回请求ID。
+  /// 此ID可用于后续通过updateRequest方法更新请求状态，
+  /// 从而实现在同一条记录中跟踪请求的完整生命周期。
+  ///
+  /// 返回请求ID，可用于后续更新请求状态
+  String addRequest(
     String url,
     String method, {
     Map<String, dynamic>? headers,
@@ -56,9 +65,10 @@ class ApiMonitor {
     final now = DateTime.now();
     final requestStartTime = startTime ?? now;
     final duration = now.difference(requestStartTime).inMilliseconds;
+    final requestId = now.millisecondsSinceEpoch.toString();
 
     final request = {
-      'id': now.millisecondsSinceEpoch.toString(),
+      'id': requestId,
       'url': url,
       'method': method,
       'headers': headers,
@@ -74,6 +84,52 @@ class ApiMonitor {
     };
 
     _requests.add(request);
+    return requestId;
+  }
+
+  /// 更新请求状态
+  ///
+  /// 根据请求ID查找并更新现有请求的状态和相关信息。
+  /// 这是实现"一个请求只显示一条记录"的核心方法，
+  /// 它允许在请求完成时更新之前创建的请求记录，
+  /// 而不是创建新的记录。
+  ///
+  /// [requestId] 请求ID，由addRequest方法返回
+  /// [statusCode] 响应状态码
+  /// [response] 响应数据
+  /// [error] 错误信息
+  /// [status] 请求状态（success或failed）
+  ///
+  /// 返回是否成功更新（true表示找到并更新了请求，false表示未找到请求）
+  bool updateRequest(
+    String requestId, {
+    int? statusCode,
+    dynamic response,
+    String? error,
+    RequestStatus? status,
+  }) {
+    final now = DateTime.now();
+
+    for (final request in _requests) {
+      if (request['id'] == requestId) {
+        // 计算请求持续时间
+        final startTime = request['startTime'] as DateTime;
+        final duration = now.difference(startTime).inMilliseconds;
+
+        // 更新请求信息
+        if (status != null) request['status'] = status;
+        if (response != null) request['response'] = response;
+        if (error != null) request['error'] = error;
+        if (statusCode != null) request['statusCode'] = statusCode;
+
+        request['endTime'] = now;
+        request['duration'] = duration;
+
+        return true;
+      }
+    }
+
+    return false; // 未找到请求
   }
 
   /// 获取所有请求
