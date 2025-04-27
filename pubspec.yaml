@@ -1,6 +1,6 @@
 name: flutter_dev_console
 description: A lightweight Flutter dev console for viewing API requests, logs, and analytics events in real time.
-version: 1.0.0
+version: 1.0.2
 repository: https://github.com/jiikawa/flutter_dev_console.git
 
 environment:
